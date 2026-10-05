@@ -1,7 +1,7 @@
 name: 术数精讲 · 21 期批量渲染
 
 # 手动触发。本地 4 核渲 21 期要 7.5 小时；这里 21 个任务同时并行。
-# 公开仓库的 Actions 免费额度是 2000 分钟/月，21 期 × 约 40 分钟够用。
+# 公开仓库的 Actions 免费额度 2000 分钟/月。
 on:
   workflow_dispatch:
     inputs:
@@ -18,12 +18,33 @@ on:
         required: false
         default: '2'
       stride:
-        description: '抽样步长（每 N 帧渲一帧再补；6 是本机实测值，填 1 = 全帧慢但最保险）'
+        description: '抽样步长（每 N 帧渲一帧再补；6 是本机实测值，填 1 = 全帧最保险但慢）'
         required: false
         default: '6'
 
 jobs:
+  # ⚠️ `matrix` 是**静态**的，`inputs.from` / `inputs.to` 不会过滤它
+  #    （踩过：以为只跑第 1 期做冒烟测试，结果 21 个任务全起来了）。
+  #    所以要一个 prepare 任务先把区间算成 JSON 数组，再喂给 matrix。
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      periods: ${{ steps.gen.outputs.periods }}
+    steps:
+      - id: gen
+        run: |
+          FROM=${{ inputs.from }}
+          TO=${{ inputs.to }}
+          FROM=${FROM:-1}; TO=${TO:-21}
+          if [ "$FROM" -lt 1 ] || [ "$TO" -gt 21 ] || [ "$FROM" -gt "$TO" ]; then
+            echo "❌ 区间不合法：$FROM..$TO（要在 1..21 内且 FROM<=TO）"; exit 1
+          fi
+          arr=$(seq "$FROM" "$TO" | sed 's/^/"/;s/$/"/' | paste -sd, -)
+          echo "periods=[$arr]" >> "$GITHUB_OUTPUT"
+          echo "将渲染第 $FROM..$TO 期（$(seq "$FROM" "$TO" | wc -l) 个任务）"
+
   render:
+    needs: prepare
     name: 第 ${{ matrix.period }} 期
     runs-on: ubuntu-latest
     timeout-minutes: 90
@@ -31,13 +52,20 @@ jobs:
       fail-fast: false            # 一期失败不影响其他期
       max-parallel: 21
       matrix:
-        period: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]
+        period: ${{ fromJSON(needs.prepare.outputs.periods) }}
 
     steps:
+      # ⚠️ **必须补零**。matrix 里 `period` 是数字，`${{ matrix.period }}` 会插值成
+      #    `1` 而不是 `01`，而目录/资源名是 `qianfa-l01`（个位数期号全失败，
+      #    10-21 正常——2026-10-05 踩过）。这里统一用 printf 补零。
+      - name: 定位期号目录
+        id: meta
+        run: echo "dir=qianfa-l$(printf '%02d' ${{ matrix.period }})" >> "$GITHUB_OUTPUT"
+
       - uses: actions/checkout@v4
 
       - name: 装依赖
-        working-directory: qianfa-l${{ matrix.period }}
+        working-directory: ${{ steps.meta.outputs.dir }}
         run: |
           node -v && npm -v
           npm ci --no-audit --no-fund
@@ -46,28 +74,29 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg python3-numpy
-          # 系统里有 Chrome/Chromium 就用它，省掉 Remotion 下载 Chromium 的时间
           for b in google-chrome-stable google-chrome chromium chromium-browser; do
             p=$(command -v "$b" || true)
             if [ -n "$p" ]; then echo "REMOTION_BROWSER_EXECUTABLE=$p" >> "$GITHUB_ENV"; echo "用 $p"; break; fi
           done
 
-      - name: 校验期号与资产（早失败早看到原因）
+      - name: 校验资产（早失败早看到原因）
+        env:
+          DIR: ${{ steps.meta.outputs.dir }}
+          P: ${{ matrix.period }}
         run: |
-          P=${{ matrix.period }}
-          SLUG=$(printf 'qianfa-l%02d' "$P")
-          D="qianfa-l$P"
-          test -d "$D" || { echo "❌ 缺目录 $D"; exit 1; }
-          test -f "$D/src/qianfa/spec.ts"   || { echo "❌ 缺 spec.ts"; exit 1; }
-          test -f "$D/src/common/timeline.ts" || { echo "❌ 缺 timeline.ts"; exit 1; }
-          test -f "$D/public/assets/$SLUG/audio.mp3" || { echo "❌ 缺音频"; exit 1; }
-          # 字体是指向 shared/fonts 的符号链接，这里确认它能解析到真实文件
-          ls "$D/public/fonts/LXGWWenKai-Regular.ttf" >/dev/null || { echo "❌ 字体链接断了"; exit 1; }
-          grep -oE 'TOTAL_FRAMES = [0-9]+' "$D/src/common/timeline.ts" | head -1
-          echo "✅ $SLUG 资产齐了"
+          SLUG="qianfa-l$(printf '%02d' "$P")"
+          echo "期号 $P → 目录 $DIR / slug $SLUG"
+          test -d "$DIR" || { echo "❌ 缺目录 $DIR"; exit 1; }
+          test -f "$DIR/src/qianfa/spec.ts"     || { echo "❌ 缺 spec.ts"; exit 1; }
+          test -f "$DIR/src/common/timeline.ts" || { echo "❌ 缺 timeline.ts"; exit 1; }
+          test -f "$DIR/public/assets/$SLUG/audio.mp3" || { echo "❌ 缺音频"; exit 1; }
+          # 字体是指向 shared/fonts 的符号链接，确认能解析到真实文件
+          ls "$DIR/public/fonts/LXGWWenKai-Regular.ttf" >/dev/null || { echo "❌ 字体链接断了"; exit 1; }
+          grep -oE 'TOTAL_FRAMES = [0-9]+' "$DIR/src/common/timeline.ts" | head -1
+          echo "✅ 资产齐了"
 
       - name: 渲染
-        working-directory: qianfa-l${{ matrix.period }}
+        working-directory: ${{ steps.meta.outputs.dir }}
         env:
           # 仓库里放的是 64kbps 单声道 MP3。原始 WAV 每期 91.8MB、21 期 1.9GB，
           # 而最终编码本来就是 `-c:a aac -b:a 160k` 重编码，源精度才是上限。
@@ -75,10 +104,9 @@ jobs:
           # swiftshader = 软件 OpenGL。GitHub runner 无 GPU，
           # **别改成 angle/vulkan**：无头容器里会悄悄退回软件渲染，反而更慢。
           REMOTION_GL: swiftshader
-          # render_fast.sh 的路径契约：中间帧放 runner 临时盘，成片进仓库 out/ 便于上传
           RENDER_ROOT: ${{ runner.temp }}/render
           RENDER_OUT: ${{ github.workspace }}/out
-          VIDEO_OUT: ${{ github.workspace }}/out/qianfa-l${{ matrix.period }}.mp4
+          VIDEO_OUT: ${{ github.workspace }}/out/qianfa-l${{ steps.meta.outputs.dir }}.mp4
           CONC: ${{ inputs.conc }}
           STRIDE: ${{ inputs.stride }}
           KEEP_SEQ: '0'          # 渲完删中间帧，否则 runner 磁盘会满
@@ -92,6 +120,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: video-period-${{ matrix.period }}
-          path: out/qianfa-l${{ matrix.period }}.mp4
+          path: out/qianfa-l${{ steps.meta.outputs.dir }}.mp4
           retention-days: 7
           if-no-files-found: error
