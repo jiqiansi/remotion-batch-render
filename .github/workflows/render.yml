@@ -1,0 +1,97 @@
+name: 术数精讲 · 21 期批量渲染
+
+# 手动触发。本地 4 核渲 21 期要 7.5 小时；这里 21 个任务同时并行。
+# 公开仓库的 Actions 免费额度是 2000 分钟/月，21 期 × 约 40 分钟够用。
+on:
+  workflow_dispatch:
+    inputs:
+      from:
+        description: '起始期号（1-21）'
+        required: false
+        default: '1'
+      to:
+        description: '结束期号（1-21）'
+        required: false
+        default: '21'
+      conc:
+        description: '浏览器并发数（ubuntu-latest 是 2 vCPU，填 2）'
+        required: false
+        default: '2'
+      stride:
+        description: '抽样步长（每 N 帧渲一帧再补；6 是本机实测值，填 1 = 全帧慢但最保险）'
+        required: false
+        default: '6'
+
+jobs:
+  render:
+    name: 第 ${{ matrix.period }} 期
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false            # 一期失败不影响其他期
+      max-parallel: 21
+      matrix:
+        period: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 装依赖
+        working-directory: qianfa-l${{ matrix.period }}
+        run: |
+          node -v && npm -v
+          npm ci --no-audit --no-fund
+
+      - name: 装渲染依赖
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg python3-numpy
+          # 系统里有 Chrome/Chromium 就用它，省掉 Remotion 下载 Chromium 的时间
+          for b in google-chrome-stable google-chrome chromium chromium-browser; do
+            p=$(command -v "$b" || true)
+            if [ -n "$p" ]; then echo "REMOTION_BROWSER_EXECUTABLE=$p" >> "$GITHUB_ENV"; echo "用 $p"; break; fi
+          done
+
+      - name: 校验期号与资产（早失败早看到原因）
+        run: |
+          P=${{ matrix.period }}
+          SLUG=$(printf 'qianfa-l%02d' "$P")
+          D="qianfa-l$P"
+          test -d "$D" || { echo "❌ 缺目录 $D"; exit 1; }
+          test -f "$D/src/qianfa/spec.ts"   || { echo "❌ 缺 spec.ts"; exit 1; }
+          test -f "$D/src/common/timeline.ts" || { echo "❌ 缺 timeline.ts"; exit 1; }
+          test -f "$D/public/assets/$SLUG/audio.mp3" || { echo "❌ 缺音频"; exit 1; }
+          # 字体是指向 shared/fonts 的符号链接，这里确认它能解析到真实文件
+          ls "$D/public/fonts/LXGWWenKai-Regular.ttf" >/dev/null || { echo "❌ 字体链接断了"; exit 1; }
+          grep -oE 'TOTAL_FRAMES = [0-9]+' "$D/src/common/timeline.ts" | head -1
+          echo "✅ $SLUG 资产齐了"
+
+      - name: 渲染
+        working-directory: qianfa-l${{ matrix.period }}
+        env:
+          # 仓库里放的是 64kbps 单声道 MP3。原始 WAV 每期 91.8MB、21 期 1.9GB，
+          # 而最终编码本来就是 `-c:a aac -b:a 160k` 重编码，源精度才是上限。
+          AUDIO_EXT: mp3
+          # swiftshader = 软件 OpenGL。GitHub runner 无 GPU，
+          # **别改成 angle/vulkan**：无头容器里会悄悄退回软件渲染，反而更慢。
+          REMOTION_GL: swiftshader
+          # render_fast.sh 的路径契约：中间帧放 runner 临时盘，成片进仓库 out/ 便于上传
+          RENDER_ROOT: ${{ runner.temp }}/render
+          RENDER_OUT: ${{ github.workspace }}/out
+          VIDEO_OUT: ${{ github.workspace }}/out/qianfa-l${{ matrix.period }}.mp4
+          CONC: ${{ inputs.conc }}
+          STRIDE: ${{ inputs.stride }}
+          KEEP_SEQ: '0'          # 渲完删中间帧，否则 runner 磁盘会满
+          MAX_LOAD: '99'         # 别被 load 检查挡住
+          MIN_FREE_MB: '2048'
+        run: |
+          bash scripts/render_fast.sh
+          ls -lh "$VIDEO_OUT"
+
+      - name: 上传成片
+        uses: actions/upload-artifact@v4
+        with:
+          name: video-period-${{ matrix.period }}
+          path: out/qianfa-l${{ matrix.period }}.mp4
+          retention-days: 7
+          if-no-files-found: error

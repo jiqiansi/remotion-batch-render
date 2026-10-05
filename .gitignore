@@ -1,0 +1,20 @@
+# 依赖与构建产物
+node_modules/
+dist/
+.remotion/
+*.log
+
+# 调试/中间产物（不进仓库，几十 MB）
+stills/
+renders/
+render-tmp/
+.bak_*/
+scripts/__pycache__/
+
+# 音频源：仓库只放转码后的 mp3（原始 WAV 每期 91.8MB，21 期 1.9GB）
+# 要用 WAV 渲染时设 AUDIO_EXT=wav 并自行取消下面这行的注释
+# qianfa-l*/public/assets/*/audio.wav
+
+# 系统垃圾
+.DS_Store
+Thumbs.db
