@@ -1,0 +1,55 @@
+// 自动生成：scripts/tts_build.py。帧号 1 起含端点。
+export const TOTAL_FRAMES = 7902;
+export const CHAPTER_STARTS: Array<{n: number; title: string; from: number}> = [
+  {n: 1, title: "片头", from: 86},
+  {n: 2, title: "现场演示", from: 1168},
+  {n: 3, title: "但", from: 2130},
+  {n: 4, title: "它怎么用", from: 2906},
+  {n: 5, title: "三处不糊弄", from: 3686},
+  {n: 6, title: "它做不到的", from: 5289},
+  {n: 7, title: "免责与下期", from: 6873},
+];
+export type Sentence = {id: string; chapter: number; from: number; to: number; text: string};
+export const SENTENCES: Sentence[] = [
+  {id: "S01", chapter: 1, from: 86, to: 601, text: "大家好，这里是清源勘道。前二十一讲，每一讲我都手推一副盘。七步、病传、两感，推到后面，我发现一件事。这种死规矩的活，机器干得比我快。所以这期不讲课，直接看东西。"},
+  {id: "S02", chapter: 1, from: 632, to: 1112, text: "本期分四块。第一，演示，填两个干支出一个号，全程十秒。第二，它怎么用。第三，它有三处不肯含糊，这是我想讲的重点。第四，它做不到的事，一次说清。"},
+  {id: "S03", chapter: 2, from: 1188, to: 1420, text: "先来一副真的。丙午年生，甲子日得病。年命填丙午，得病日填甲子，点计算。"},
+  {id: "S04", chapter: 2, from: 1451, to: 1724, text: "三司出来了。司天子，司地卯，司人寅。天盘铺开，这一副落在太阳经。药号，破戊。"},
+  {id: "S05", chapter: 2, from: 1755, to: 2074, text: "歌诀跟着跳出来。脉沉而结病身黄，小便不利茵陈汤，便利如狂血证谛，抵当汤用泻之良。从填表到方名，十秒。"},
+  {id: "S06", chapter: 3, from: 2150, to: 2380, text: "但是先停一下。我开发这东西，but 不在这十秒。在它能跑，我却先给你看它怎么不跑。"},
+  {id: "S07", chapter: 3, from: 2411, to: 2850, text: "我见过有人把生日填进去，出来个方名，直接抓药。这一步走反了。它给你的永远是索引。号是什么，翻到哪页，那是查表。书里给的是条文，不是医嘱。"},
+  {id: "S08", chapter: 4, from: 2926, to: 3242, text: "用法就两样。年命，得病日。干支齐全最好，只记得属相也能排。不记得干支的，按日期选，它自己换算。"},
+  {id: "S09", chapter: 4, from: 3273, to: 3630, text: "出号之后拿号去查。歌诀按字号分好了栏，点开一条一条列着。上面一排标签换盘，病传、两感、五运受病都在，盘不用重填。"},
+  {id: "S10", chapter: 5, from: 3706, to: 4136, text: "第三块，三处不糊弄。第一处，无方。附表里有些号，书上就写一个无字。别人做软件会顺手补个差不多的方，我没有。看到无方，它就是无方。"},
+  {id: "S11", chapter: 5, from: 4167, to: 4448, text: "第二处，异文。同一个位置，不同传本写法不一样。软件里那个异文对照的页，把各说并排放着，不替你选。"},
+  {id: "S12", chapter: 5, from: 4479, to: 4881, text: "第三处，书里没写清的。比如一个字号只有五个证，天干却能取到十个。多出来的怎么归，原书没有明文。它的做法是标四个字，书中未明确。"},
+  {id: "S13", chapter: 5, from: 4912, to: 5233, text: "这三处，做文章可以说存疑，读者自己琢磨。做软件不行，屏幕总得显示点什么。我选的是空着。空着比编一个强。"},
+  {id: "S14", chapter: 6, from: 5309, to: 5604, text: "第四块，做不到的事。它不知道你是什么病。你填对干支，它就推，推出来的号对不对得上你的实际情况，它管不着。"},
+  {id: "S15", chapter: 6, from: 5635, to: 5988, text: "剂量、煎法、炮制，它一概不碰。两、几铢是那个年代的衡制。折成今天的克数，各家说法都不一样。这一块我不做。"},
+  {id: "S16", chapter: 6, from: 6019, to: 6405, text: "古人说的病名，跟今天的病名也对不上号。它给的是古书里的号，不是诊断。它是一把尺子，量出来的是一个数。这个数什么意思，还得你自己看。"},
+  {id: "S17", chapter: 6, from: 6436, to: 6817, text: "所以用之前还是那句。先有中医基础，再看这个软件。读六经是为了查歌诀，看病还是看病，这两件事它分得很开，合成一件就是走反了。"},
+  {id: "S18", chapter: 7, from: 6893, to: 7341, text: "最后把话说在前面。这是古籍算法的拆解和复现，属于传统文化研究，不是医疗器械，也不是诊断工具。它给出的每一个号，都只是古书里的一条索引。身体不舒服，去医院。"},
+  {id: "S19", chapter: 7, from: 7372, to: 7801, text: "这个软件免费，下载在简介里，安卓直接装。讲到这里，下一讲换个方向。前面讲的是怎么算，接下来我挑几副真盘，从输入到方名，全程手推给你看。下一讲见。"},
+];
+export type ShotRange = {id: string; sentence: string; from: number; to: number};
+export const SHOT_RANGES: ShotRange[] = [
+  {id: "SC01", sentence: "S01", from: 86, to: 631},
+  {id: "SC02", sentence: "S02", from: 632, to: 1187},
+  {id: "SC03", sentence: "S03", from: 1188, to: 1450},
+  {id: "SC04", sentence: "S04", from: 1451, to: 1754},
+  {id: "SC05", sentence: "S05", from: 1755, to: 2149},
+  {id: "SC06", sentence: "S06", from: 2150, to: 2410},
+  {id: "SC07", sentence: "S07", from: 2411, to: 2925},
+  {id: "SC08", sentence: "S08", from: 2926, to: 3272},
+  {id: "SC09", sentence: "S09", from: 3273, to: 3705},
+  {id: "SC10", sentence: "S10", from: 3706, to: 4166},
+  {id: "SC11", sentence: "S11", from: 4167, to: 4478},
+  {id: "SC12", sentence: "S12", from: 4479, to: 4911},
+  {id: "SC13", sentence: "S13", from: 4912, to: 5308},
+  {id: "SC14", sentence: "S14", from: 5309, to: 5634},
+  {id: "SC15", sentence: "S15", from: 5635, to: 6018},
+  {id: "SC16", sentence: "S16", from: 6019, to: 6435},
+  {id: "SC17", sentence: "S17", from: 6436, to: 6892},
+  {id: "SC18", sentence: "S18", from: 6893, to: 7371},
+  {id: "SC19", sentence: "S19", from: 7372, to: 7902},
+];

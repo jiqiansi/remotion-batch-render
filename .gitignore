@@ -18,3 +18,8 @@ scripts/__pycache__/
 # 系统垃圾
 .DS_Store
 Thumbs.db
+
+# 凭证：绝不提交
+# token.txt
+# .ghtoken
+# *.token

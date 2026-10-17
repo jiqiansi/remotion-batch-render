@@ -6,13 +6,13 @@ on:
   workflow_dispatch:
     inputs:
       from:
-        description: '起始期号（1-21）'
+        description: '起始期号（1-22）'
         required: false
-        default: '1'
+        default: '22'
       to:
-        description: '结束期号（1-21）'
+        description: '结束期号（1-22）'
         required: false
-        default: '21'
+        default: '22'
       conc:
         description: '浏览器并发数（ubuntu-latest 是 2 vCPU，填 2）'
         required: false
@@ -36,8 +36,8 @@ jobs:
           FROM=${{ inputs.from }}
           TO=${{ inputs.to }}
           FROM=${FROM:-1}; TO=${TO:-21}
-          if [ "$FROM" -lt 1 ] || [ "$TO" -gt 21 ] || [ "$FROM" -gt "$TO" ]; then
-            echo "❌ 区间不合法：$FROM..$TO（要在 1..21 内且 FROM<=TO）"; exit 1
+          if [ "$FROM" -lt 1 ] || [ "$TO" -gt 22 ] || [ "$FROM" -gt "$TO" ]; then
+            echo "❌ 区间不合法：$FROM..$TO（要在 1..22 内且 FROM<=TO）"; exit 1
           fi
           arr=$(seq "$FROM" "$TO" | sed 's/^/"/;s/$/"/' | paste -sd, -)
           echo "periods=[$arr]" >> "$GITHUB_OUTPUT"
