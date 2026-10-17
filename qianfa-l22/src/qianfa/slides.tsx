@@ -38,10 +38,17 @@ const Card: React.FC<{x: number; y: number; w: number; h: number; k?: string; v?
       <CText cx={x + w / 2} cy={y + Math.min(38, h * 0.24)} size={Math.min(26, h * 0.19)} weight={700}
              family={FONT_KAI_BOLD} color={hot ? CINNABAR : INK_SOFT} dy={-2}>{k}</CText>
     ) : null}
-    {v ? (
-      <CText cx={x + w / 2} cy={y + h * (k ? 0.55 : 0.42)} size={Math.min(52, h * (k ? 0.34 : 0.42))} weight={700}
-             family={FONT_KAI_BOLD} color={hot ? CINNABAR : tone} dy={-2}>{v}</CText>
-    ) : null}
+    {v ? (() => {
+      // **字号按字数收缩**：CText 是 nowrap，长词会撑出卡片（2026-10-17 看片发现
+      // 「填进去·直接抓药」左右都跑出框）。中文按每字 ≈ 1em 估算，留 12% 内边距。
+      const base = Math.min(52, h * (k ? 0.34 : 0.42));
+      const fit = (w * 0.88) / Math.max(1, v.length);
+      const size = Math.max(18, Math.min(base, fit));
+      return (
+        <CText cx={x + w / 2} cy={y + h * (k ? 0.55 : 0.42)} size={size} weight={700}
+               family={FONT_KAI_BOLD} color={hot ? CINNABAR : tone} dy={-2}>{v}</CText>
+      );
+    })() : null}
     {note ? (
       <CText cx={x + w / 2} cy={y + h - Math.min(24, h * 0.17)} size={Math.min(22, h * 0.145)} weight={600}
              family={FONT_KAI} color={INK_FAINT} dy={-1}>{note}</CText>

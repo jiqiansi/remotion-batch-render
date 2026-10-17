@@ -1,45 +1,66 @@
 import type {ShotSpec} from './shots';
 
 /**
- * L22 · 排盘软件 · 19 镜
- * 与 script/narration.txt 的 19 个 `## shot` 严格一一对应（数量不等会直接抛错）。
- * 开场钩子 → 真盘演示（丙午·甲子，实测结果）→ but → 用法 → 三处不糊弄 → 边界 → 免责/下期。
+ * L22 · 药方计算姬 · 24 镜
+ * 与 script/narration.txt 的 24 个 `## shot` 严格一一对应。
+ *
+ * 结构（照爆款模式重构）：
+ *   场景开场（那天我感冒了）→ 十秒悬念 → 免责 → 演示递进（什么时候好→多会儿嘎→没病）
+ *   → 观众骂点替说 → 「它是错的。/吗。」反转 → 数术×中医符号相容的道 → 定位 → 收尾
+ * 演示数据全部来自 shanghanCore 实测（丙午命·甲子日 = 2026-10-17）。
  */
 export const SHOT_SPECS: Record<string, ShotSpec> = {
-  SC01: {kind: 'title', lecname: "排盘软件", agenda: ["现场演示", "它怎么用", "三处不糊弄", "做不到的事", "免责与下期"]},
+  SC01: {kind: 'title', lecname: "药方计算姬", agenda: ["感冒那天", "十秒出答案", "先说丑话", "演示", "反转", "拆解", "道理"]},
 
-  SC02: {kind: 'slide', slide: {kind: 'steps', title: "本期分四块", sub: "四块讲完", items: ["演示：十秒出号", "它怎么用", "三处不糊弄（重点）", "做不到的事，一次说清"]}},
+  SC02: {kind: 'slide', slide: {kind: 'quote', title: "十秒之后", sub: "它给了我一个答案", lines: ["几号能好？"]}},
 
-  SC03: {kind: 'slide', slide: {kind: 'cards', title: "先来一副真的", sub: "丙午年 · 甲子日", cards: [{k: "年命", v: "丙午"}, {k: "得病日", v: "甲子"}]}},
+  SC03: {kind: 'slide', slide: {kind: 'boundary', title: "免责声明", sub: "丑话说在前面", items: ["只讲历算模型，算法拆解", "不构成医疗建议", "感冒多喝水，大病去医院"]}},
 
-  SC04: {kind: 'pan', pan: {plate: ['丙', '午', '甲', '子'], stage: 'read', centerNote: "太阳经 · 破戊"}},
+  SC04: {kind: 'slide', slide: {kind: 'steps', title: "回到软件", sub: "填两样", items: ["出生年", "得病日期：2026-10-17（甲子日）", "点计算"]}},
 
-  SC05: {kind: 'slide', slide: {kind: 'gatha', title: "歌诀跳出来", sub: "从填表到方名，十秒", lines: ["脉沉而结病身黄；", "小便不利茵陈汤；", "便利如狂血证谛；", "抵当汤用泻之良。"]}},
+  SC05: {kind: 'pan', pan: {plate: ['丙', '午', '甲', '子'], stage: 'read', centerNote: "太阳经 · 破戊"}},
 
-  SC06: {kind: 'slide', slide: {kind: 'boundary', title: "but 不在这十秒", sub: "我想讲的是它怎么不跑", items: ["我开发这东西", "but 在它能跑", "我却先给你看它怎么不跑"]}},
+  SC06: {kind: 'slide', slide: {kind: 'gatha', title: "汗瘥法", sub: "不吃药多会儿好", lines: ["水木元来号甲丁", "—— 甲日或丁日解"]}},
 
-  SC07: {kind: 'slide', slide: {kind: 'compare', title: "见过的反例", sub: "这一步走反了", cards: [{k: "有人", v: "填进去 · 直接抓药"}, {k: "它给你的", v: "永远是索引"}]}},
+  SC07: {kind: 'slide', slide: {kind: 'cards', title: "公历都换算好了", sub: "丙午命 · 甲子日实测", cards: [
+    {k: "甲日", v: "10月17日", note: "当天", tone: 'green'},
+    {k: "丁日", v: "10月20日", note: "后天", tone: 'green'},
+  ]}},
 
-  SC08: {kind: 'slide', slide: {kind: 'points', title: "用法就两样", sub: "年命 + 得病日", items: ["干支齐全最好", "只记得属相也能排", "不记得干支，按日期选，它自己换算"]}},
+  SC08: {kind: 'slide', slide: {kind: 'gatha', title: "多会儿嘎？", sub: "棺墓法 · 换个输入它也答", lines: ["金火尸中有气微", "—— 翻译：还有气，死不了"]}},
 
-  SC09: {kind: 'slide', slide: {kind: 'points', title: "拿号去查", sub: "换盘不用重填", items: ["歌诀按字号分好了栏", "一条一条列着", "标签换盘：病传 / 两感 / 五运受病", "盘不用重填"]}},
+  SC09: {kind: 'slide', slide: {kind: 'points', title: "没病也能看", sub: "五运受病 · 治未病", items: ["预防季节性疾病", "每个月算法不一样", "按月推"]}},
 
-  SC10: {kind: 'slide', slide: {kind: 'quote', title: "第一处 · 无方", sub: "看到无方，就是无方", lines: ["附表里有些号", "书上就写一个无字", "别人会顺手补个方", "我没有"]}},
-  SC11: {kind: 'slide', slide: {kind: 'points', title: "第二处 · 异文", sub: "各说并排，不替你选", items: ["同一个位置", "不同传本写法不一样", "异文对照页并排放着"]}},
+  SC10: {kind: 'slide', slide: {kind: 'quote', title: "你可能要骂了", sub: "我等这一刻很久了", lines: ["这时候"]}},
 
-  SC12: {kind: 'slide', slide: {kind: 'points', title: "第三处 · 书中未明确", sub: "没写清就不编", items: ["字号只有五个证", "天干却能取到十个", "多出来的怎么归，原书无明文", "标注：书中未明确"]}},
+  SC11: {kind: 'slide', slide: {kind: 'quote', title: "这他妈的是什么玩意儿", sub: "替你骂", lines: ["病还没看，药方先出来", "症状一句没问，几号能好", "这不是拿人命开玩笑吗"]}},
 
-  SC13: {kind: 'slide', slide: {kind: 'quote', title: "做文章可以存疑，做软件不行", sub: "我选的是空着", lines: ["屏幕必须显示点什么", "我选的是空着", "空着比编一个强"]}},
+  SC12: {kind: 'slide', slide: {kind: 'quote', title: "你骂得对", sub: "我接着骂", lines: ["接着往下看"]}},
 
-  SC14: {kind: 'slide', slide: {kind: 'boundary', title: "做不到 · 一", sub: "它不知道你是什么病", items: ["填对干支，它就推", "号对不对得上实情，它管不着"]}},
+  SC13: {kind: 'slide', slide: {kind: 'points', title: "伤寒钤法", sub: "托名医圣的书", items: ["古代算卦的 + 走方郎中", "给病算命的方法", "历史上恶评如潮"]}},
 
-  SC15: {kind: 'slide', slide: {kind: 'boundary', title: "做不到 · 二", sub: "剂量一概不碰", items: ["两、几铢是那个年代的衡制", "折成今天的克数各家不一", "这一块我不做"]}},
+  SC14: {kind: 'slide', slide: {kind: 'points', title: "算法有问题", sub: "我不装", items: ["前后矛盾", "五个证对十个天干", "多出来的怎么归，原书没写"]}},
 
-  SC16: {kind: 'slide', slide: {kind: 'points', title: "做不到 · 三", sub: "它是一把尺子", items: ["古病名跟今天对不上号", "它给的是古书里的号，不是诊断", "量出来的是一个数", "这个数什么意思，还得你自己看"]}},
+  SC15: {kind: 'slide', slide: {kind: 'quote', title: "它是错的。", sub: "先下结论", lines: ["它是错的。"]}},
 
-  SC17: {kind: 'slide', slide: {kind: 'boundary', title: "用之前", sub: "读六经是查歌诀，看病还是看病", items: ["先有中医基础，再看这个软件", "这两件事它分得很开", "别替它合并"]}},
+  SC16: {kind: 'slide', slide: {kind: 'quote', title: "吗。", sub: "一个字，全片的扣", lines: ["吗。"]}},
 
-  SC18: {kind: 'slide', slide: {kind: 'boundary', title: "免责声明", sub: "请务必看清", items: ["古籍算法的拆解和复现，传统文化研究", "不是医疗器械，也不是诊断工具", "每个号只是古书里的一条索引", "身体不舒服，去医院"]}},
+  SC17: {kind: 'slide', slide: {kind: 'compare', title: "两套符号系统", sub: "都是抽象符号模型", cards: [
+    {k: "数术", v: "预测未来", note: "世界规律"},
+    {k: "中医", v: "理解疾病", note: "人体运行"},
+  ]}},
 
-  SC19: {kind: 'slide', slide: {kind: 'closing', title: "免费 · 下期", sub: "挑几副真盘，全程手推", items: ["下载在简介里，安卓直接装", "下一讲换个方向", "从输入到方名，全程手推给你看"]}},
+  SC18: {kind: 'slide', slide: {kind: 'points', title: "高度相容", sub: "几千年互相渗透", items: ["有的符号相同", "有的近似", "伤寒钤法就长在交叉点上"]}},
+
+  SC19: {kind: 'slide', slide: {kind: 'points', title: "量化", sub: "古人做过的尝试", items: ["传变规律 → 十二地支加临", "五脏六邪侵害关系 → 可推演", "个位输入，结构化输出，全程可复算"]}},
+
+  SC20: {kind: 'slide', slide: {kind: 'quote', title: "作为思维模型", sub: "它是成立的", lines: ["算得稳，才谈得上读和校"]}},
+
+  SC21: {kind: 'slide', slide: {kind: 'points', title: "它的位置", sub: "不神化，不全盘否定", items: ["靠它开方抓药会出人命", "但也不是废纸", "是古人用数理理解人体的尝试"]}},
+
+  SC22: {kind: 'slide', slide: {kind: 'boundary', title: "两种糟蹋", sub: "都要避开", items: ["当猎奇玩具", "当神仙下凡", "都不是正路"]}},
+
+  SC23: {kind: 'slide', slide: {kind: 'points', title: "想学往下看", sub: "免费 · 开源", items: ["21 讲从零讲到一，就在这个账号", "软件开源，GitHub 可下", "安卓和网页端都有"]}},
+
+  SC24: {kind: 'slide', slide: {kind: 'closing', title: "正本清源", sub: "我是清源", items: ["摘夺那天上宫阙"]}},
 };
