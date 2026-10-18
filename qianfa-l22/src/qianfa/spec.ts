@@ -38,20 +38,20 @@ export const SHOT_SPECS: Record<string, ShotSpec> = {
   SC04: {kind: 'slide', slide: {kind: 'boundary', title: "免责声明", sub: "", items: ["本视频仅供历算模型", "不够成任何医疗指导"]}},
 
   // ═══ 演示（左功能 / 右截图）═══
-  SC05: {kind: 'appshot', shot: {title: "打开软件", sub: "简介的页面", items: ["输入你的年龄", "输入得病日期", "下滑"], hot: 0, shot: "ui-01-input.png", foot: "界面：软件输入页"}},
-  SC06: {kind: 'appshot', shot: {title: "诶我去", sub: "怎么是中药啊", items: ["难喝", "不喝", "删掉。。。"], hot: 0, shot: "ui-03-result.png", foot: "界面：排盘结果（先别急着删）"}},
-  SC07: {kind: 'appshot', shot: {title: "我劝你别删", sub: "", items: ["往下看"], hot: -1, shot: "ui-04-pan.png", foot: "界面：天地盘 + 8 盘面"}},
+  SC05: {kind: 'appshot', shot: {title: "打开软件", sub: "简介的页面", items: ["出生年干支", "得病日干支", "性别"], hot: 0, shot: "ui-01-input.png"}},
+  SC06: {kind: 'appshot', shot: {title: "诶我去", sub: "怎么是中药啊", items: ["六经病证", "推算药号", "药号歌诀"], hot: 1, shot: "ui-03-result.png"}},
+  SC07: {kind: 'appshot', shot: {title: "我劝你别删", sub: "", items: ["十六宫天地盘", "三司定局", "八张盘面切换"], hot: 0, shot: "ui-04-pan.png"}},
 
   // 感冒 → 汗瘥（甲丁日卡）
-  SC08: {kind: 'appshot', shot: {title: "我感冒了", sub: "想知道不吃药多会儿会好", items: ["看这个", "它已经做出了预测", "你将在几号几号好"], hot: 1, shot: "ui-05-hancuo.png", foot: "界面：汗瘥卡（甲日 10-17 / 丁日 10-20）"}},
+  SC08: {kind: 'appshot', shot: {title: "我感冒了", sub: "想知道不吃药多会儿会好", items: ["汗瘥法", "解厄日期", "公历换算"], hot: 1, shot: "ui-05-hancuo.png"}},
   // 快嘎 → 棺墓
-  SC09: {kind: 'appshot', shot: {title: "病的严重", sub: "快嘎了，多会儿会嘎", items: ["看这个", "它已经做出了预测", "几号几号退出生物圈"], hot: 2, shot: "ui-06-coffin.png", foot: "界面：棺墓法五步推演"}},
+  SC09: {kind: 'appshot', shot: {title: "病的严重", sub: "快嘎了，多会儿会嘎", items: ["棺墓法", "五运定墓", "凶险断语"], hot: 1, shot: "ui-06-coffin.png"}},
 
   // 没病 → 五运（每月不一样）
-  SC10: {kind: 'appshot', shot: {title: "治胃袋，额不，未病", sub: "预防季节性疾病", items: ["看这个", "每个月都不一样"], hot: 1, shot: "ui-07-wuyun.png", foot: "界面：五运受病（按月推）"}},
+  SC10: {kind: 'appshot', shot: {title: "治胃袋，额不，未病", sub: "预防季节性疾病", items: ["五运受病", "客主加临", "按月推算"], hot: 0, shot: "ui-07-wuyun.png"}},
 
   // 拿活人试刀（老板）
-  SC11: {kind: 'appshot', shot: {title: "拿活人试刀", sub: "我没病，我也没想病", items: ["把我老板的生日填进去了", "想看看他多会儿会嘎", "十秒钟，它真给了个日期", "默默把软件关了"], hot: 2, shot: "ui-03-result.png", foot: "界面：同一个结果卡，输入换个人"}},
+  SC11: {kind: 'appshot', shot: {title: "拿活人试刀", sub: "我没病，我也没想病", items: ["换一组输入", "结果跟着变", "日期照样给"], hot: 1, shot: "ui-03-result.png"}},
 
   // ═══ 骂点（观点，不用截图）═══
   SC12: {kind: 'slide', slide: {kind: 'quote', title: "说了这么多", sub: "", lines: ["你可能已经忍不住骂我了"]}},
@@ -71,10 +71,10 @@ export const SHOT_SPECS: Record<string, ShotSpec> = {
   SC19: {kind: 'slide', slide: {kind: 'points', title: "符号相容", sub: "在漫长的发展中", items: ["有的一致", "有的近似", "高度相容"]}},
 
   // 六经营卫 → 右侧盘面截图（嵌套结构实证）
-  SC20: {kind: 'appshot', shot: {title: "六经营卫 · 一般算法", sub: "", items: ["天地盘嵌套，表示极其细微的关系", "传变规律量化在 12 地支的加临上", "表示病邪深浅"], hot: 0, shot: "ui-04-pan.png", foot: "界面：天地盘（嵌套结构本尊）"}},
+  SC20: {kind: 'appshot', shot: {title: "六经营卫 · 一般算法", sub: "", items: ["天地盘嵌套", "十二地支加临", "病邪深浅"], hot: 1, shot: "ui-04-pan.png"}},
 
   // 主病行流 → 主病行流卡
-  SC21: {kind: 'appshot', shot: {title: "主病行流 · 简便算法", sub: "", items: ["五脏和六邪侵害关系", "病邪种类", "侵袭位置"], hot: 1, shot: "ui-09-mainflow.png", foot: "界面：主病行流（主病庚·大肠 / 行流丁·心）"}},
+  SC21: {kind: 'appshot', shot: {title: "主病行流 · 简便算法", sub: "", items: ["主病", "行流", "六邪判定"], hot: 0, shot: "ui-09-mainflow.png"}},
 
   SC22: {kind: 'slide', slide: {kind: 'quote', title: "诸如此类", sub: "", lines: ["诸如此类"]}},
 
@@ -83,7 +83,7 @@ export const SHOT_SPECS: Record<string, ShotSpec> = {
   SC24: {kind: 'slide', slide: {kind: 'points', title: "思维模型", sub: "", items: ["看待问题的新角度", "新思路", "不以算病搏猎奇感的方式宣传"]}},
 
   // ═══ 收尾 ═══
-  SC25: {kind: 'appshot', shot: {title: "往期视频 + 开源", sub: "", items: ["免费讲解了这门技术", "软件已开源至 GitHub", "下载链接在简介，只支持安卓版本和网页端"], hot: 1, shot: "ui-10-notebook.png", foot: "界面：案例管理（App 核心功能）"}},
+  SC25: {kind: 'appshot', shot: {title: "往期视频 + 开源", sub: "", items: ["案例保存", "历史记录", "安卓 · 网页端"], hot: 0, shot: "ui-10-notebook.png"}},
   SC26: {kind: 'slide', slide: {kind: 'closing', title: "正本清源", sub: "我是清源", items: ["摘夺那天上宫阙"]}},
   SC27: {kind: 'slide', slide: {kind: 'quote', title: "", sub: "", lines: ["▚▚▚ BGM 起 ▚▚▚"]}},
 };

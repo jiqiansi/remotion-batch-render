@@ -47,19 +47,19 @@ export const AppShot: React.FC<{spec: AppShotSpec; N: number; f0: number; dur: n
       ) : null}
 
       {/* 左侧功能列表 */}
-      <div style={{position: 'absolute', left: 56, top: 200, width: 470}}>
+      <div style={{position: 'absolute', left: 56, top: 210, width: 470}}>
         {items.map((it, i) => {
           const p = clamp01((n - (10 + i * 8)) / 12);
           const isHot = i === hot;
           return (
-            <div key={i} style={{opacity: p, marginBottom: 20}}>
+            <div key={i} style={{opacity: p, marginBottom: 34}}>
               <div style={{
                 display: 'flex', alignItems: 'center',
                 borderLeft: `4px solid ${isHot ? CINNABAR : 'rgba(0,0,0,0.08)'}`,
                 paddingLeft: 14,
               }}>
                 <span style={{
-                  fontFamily: FONT_KAI, fontWeight: 600, fontSize: 24,
+                  fontFamily: FONT_KAI, fontWeight: 600, fontSize: 26,
                   color: isHot ? CINNABAR : INK_MID, lineHeight: 1.4,
                 }}>{it}</span>
               </div>
@@ -67,6 +67,16 @@ export const AppShot: React.FC<{spec: AppShotSpec; N: number; f0: number; dur: n
           );
         })}
       </div>
+
+      {/* 左列收口细线（PPT 语法：一个视觉块要有边界） */}
+      <div style={{
+        position: 'absolute', left: 56, top: 560, width: 380, height: 1.5,
+        background: 'rgba(0,0,0,0.10)', opacity: clamp01((n - 20) / 12),
+      }} />
+      <CText cx={180} cy={598} size={19} weight={600} family={FONT_KAI}
+             color={INK_SOFT} opacity={clamp01((n - 22) / 12)} dy={-1}>
+        伤寒钤法排盘 · 开源
+      </CText>
 
       {/* 右侧手机截图 */}
       {shotSrc ? (
