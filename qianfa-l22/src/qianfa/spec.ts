@@ -45,7 +45,7 @@ export const SHOT_SPECS: Record<string, ShotSpec> = {
   // 感冒 → 汗瘥（甲丁日卡）
   SC08: {kind: 'appshot', shot: {title: "我感冒了", sub: "想知道不吃药多会儿会好", items: ["汗瘥法", "解厄日期", "公历换算"], hot: 1, shot: "ui-05-hancuo.png"}},
   // 快嘎 → 棺墓
-  SC09: {kind: 'appshot', shot: {title: "病的严重", sub: "快嘎了，多会儿会嘎", items: ["棺墓法", "五运定墓", "凶险断语"], hot: 1, shot: "ui-06-coffin.png"}},
+  SC09: {kind: 'appshot', shot: {title: "病的严重", sub: "快嘎了，多会儿会嘎", items: ["五运定墓", "旺支顺推六步", "对应棺墓歌诀"], hot: 2, shot: "ui-06-coffin.png"}},
 
   // 没病 → 五运（每月不一样）
   SC10: {kind: 'appshot', shot: {title: "治胃袋，额不，未病", sub: "预防季节性疾病", items: ["五运受病", "客主加临", "按月推算"], hot: 0, shot: "ui-07-wuyun.png"}},
