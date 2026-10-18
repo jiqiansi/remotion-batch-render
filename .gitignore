@@ -8,8 +8,13 @@ dist/
 stills/
 renders/
 render-tmp/
+# 编辑前备份（.bak_* / .bak-时间戳 两种命名都挡）
 .bak_*/
-scripts/__pycache__/
+.bak-*
+*.bak-*
+# Python 缓存（任意层级）
+__pycache__/
+*.pyc
 
 # 音频源：仓库只放转码后的 mp3（原始 WAV 每期 91.8MB，21 期 1.9GB）
 # 要用 WAV 渲染时设 AUDIO_EXT=wav 并自行取消下面这行的注释
