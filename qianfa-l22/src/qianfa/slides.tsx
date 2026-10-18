@@ -10,7 +10,7 @@ import {PZ} from './data';
  * 一屏一个焦点：朱砂只给当前讲的那一条。
  */
 
-export type SlideKind = 'title' | 'points' | 'steps' | 'cards' | 'compare' | 'gatha' | 'quote' | 'boundary' | 'closing';
+export type SlideKind = 'title' | 'points' | 'steps' | 'cards' | 'compare' | 'gatha' | 'quote' | 'boundary' | 'closing' | 'appshot';
 
 export interface SlideSpec {
   kind: SlideKind;
@@ -25,6 +25,8 @@ export interface SlideSpec {
   hot?: number;
   /** 底注 */
   foot?: string;
+  /** appshot 用：UI 截图路径（相对 public/）与说明 */
+  shot?: string;
 }
 
 const Card: React.FC<{x: number; y: number; w: number; h: number; k?: string; v?: string; note?: string;

@@ -8,6 +8,7 @@ import {buildPlate, plateEvents} from './compute';
 import {ChangShengWheel, SanQiuWuMuTable, MuWeiRow} from './wheels';
 import {DataTable, BingchuanGrid, HandTable, ZihaoTable, type TableCol} from './tables';
 import {Slide, type SlideSpec} from './slides';
+import {AppShot, type AppShotSpec} from './appshot';
 import {WuxingRing} from '../shushu/charts';
 import type {WuXing} from '../shushu/chartdata';
 import {DizhiWheel} from '../shushu/ganzhi';
@@ -25,6 +26,7 @@ export type ShotSpec =
   | {kind: 'title'; /** 本讲路线（章节名，按序）。片头大标题淡出后接续在场，别让开头只剩一张白纸 */
      agenda?: string[]; lecname?: string}
   | {kind: 'slide'; slide: SlideSpec}
+  | {kind: 'appshot'; shot: AppShotSpec}
   /** 盘面快写：plate = [年命干, 年命支, 病日干, 病日支]，三司与天地盘全部推导，不手填。
    *  年命未知时给 plate:null + sansi:[司天,司地,司人]，只演三司那三步。 */
   | {kind: 'pan'; pan: {plate: [Gan | '', Zhi, Gan, Zhi] | null; sansi?: [Zhi, Zhi, Zhi];
@@ -51,6 +53,8 @@ const Inner: React.FC<{spec: ShotSpec; N: number; dur: number}> = ({spec, N, dur
       return <AbsoluteFill />;
     case 'slide':
       return <Slide spec={spec.slide} N={N} f0={1} dur={dur} />;
+    case 'appshot':
+      return <AppShot spec={spec.shot} N={N} f0={1} dur={dur} />;
     case 'pan': {
       const [sanT, sanD, sanR] = spec.pan.sansi ?? ['子', '卯', '寅'] as Zhi[];
       const st = spec.pan.stage ?? (spec.pan.plate ? 'read' : 'sansi');
