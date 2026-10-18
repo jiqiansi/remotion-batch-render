@@ -86,6 +86,7 @@ GAP = int(os.environ.get('GAP', 10))          # 段内句间空白帧：只留�
 PARA_GAP = int(os.environ.get('PARA_GAP', 20)) # 段末额外空白（narration.txt 用空行分段）：一段话讲完 / 切下一页才停，合计 GAP+PARA_GAP = 30 帧 ≈ 1 s
                                               # —— 这是「末拍元素落位后停 1–1.5 s 再切」的时间来源（composition-and-light.md §7）
 CHAPTER_GAP = int(os.environ.get('CHAPTER_GAP', 45))  # 章节前空白帧
+SILENT_DUR = int(os.environ.get('SILENT_DUR', 36))    # 静音镜头时长帧（括号备注行动画镜头，不出声）
 LEAD = int(os.environ.get('LEAD', 40))        # 片头静音帧
 TAIL = int(os.environ.get('TAIL', 90))        # 片尾静音帧
 SHORT_TAIL = 45                               # 段末句的末块短于此帧数就要补停留（22 帧入场 + 8 帧离场后停不满 30 帧）；段内句不判
@@ -135,6 +136,20 @@ def parse(path):
             pending_shot = m.group(1).upper()
             continue
         if line.startswith('#'):
+            continue
+        # **舞台指示/备注行不配音，但要消费 shot 标记**：整行被全角括号包住的
+        # 是给操作者的说明（标题要求、转场标记、BGM 提示），不是口播正文。
+        # 这类镜头是**纯画面静音镜**：shot 标记要消费掉（否则报「未被句子消费」），
+        # 但不进音频轨。
+        # 2026-10-18 踩过：`（标题：我开发了计算姬器，but...）`、`（无信号转场）`、
+        # `（BGM起）` 三行被当成正文念了出来。
+        if re.match(r'^（[^）]*）$', line):
+            if pending_shot is not None:
+                items.append({'type': 'silent', 'chapter': chap, 'raw': line,
+                              'gap_before': pending_gap, 'para_end': True, 'shot': pending_shot})
+                pending_shot = None
+                pending_gap = 0
+                para_break = False
             continue
         items.append({'type': 'sent', 'chapter': chap, 'raw': line, 'gap_before': pending_gap + (PARA_GAP if para_break else 0), 'para_end': False, 'shot': pending_shot})
         pending_gap = 0
@@ -546,6 +561,15 @@ async def main(narr):
             t += CHAPTER_GAP / FPS
             chapters.append({'n': it['chapter'], 'title': it['title'], 'from': int(round(t * FPS)) + 1})
             continue
+        if it['type'] == 'silent':
+            # 纯画面静音镜：不合成音频，但要给一段镜头时长（否则时间轴上该镜长度为 0）。
+            # **frame_from 必须在 gap_before 之后取**：gap_before 是上一镜讲完到本镜开始
+            # 的空白，取早了会让静音镜起点落到上一镜中间（2026-10-18 踩过：SC03 起点
+            # 287 落在 SC02 的 122–342 区间内，两镜重叠）。
+            t += it['gap_before'] / FPS
+            it['frame_from'] = int(round(t * FPS)) + 1
+            t += SILENT_DUR / FPS
+            continue
         t += it['gap_before'] / FPS
         raw = it['raw']
         if '|' in raw:
@@ -571,6 +595,18 @@ async def main(narr):
     # 镜头区间：每句必须有唯一 ## shot SCnn 标记；镜头从本句起、到下一镜头前一帧止（跨句/章间留白归上一镜头）。
     seen_shots = set()
     shot_ranges = []
+    # **静音镜头先进区间表**：括号备注行（标题要求/转场/BGM）不出声，但 spec.ts 里有
+    # 对应画面，漏掉会导致 assemble 找不到镜头。区间 = [它自己的起点, 下一镜起点-1]。
+    for it in items:
+        if it['type'] != 'silent':
+            continue
+        mk = it.get('shot')
+        if not mk or mk in seen_shots:
+            continue
+        seen_shots.add(mk)
+        nxt = next((s for s in sentences if s['from'] > it['frame_from']), None)
+        shot_ranges.append({'id': mk, 'sentence': None, 'from': it['frame_from'],
+                            'to': (nxt['from'] - 1) if nxt else total})
     for i, s in enumerate(sentences):
         marker = s.get('shot')
         if not marker:
@@ -581,6 +617,14 @@ async def main(narr):
         nxt = sentences[i + 1] if i + 1 < len(sentences) else None
         shot_ranges.append({'id': marker, 'sentence': s['id'], 'from': s['from'],
                             'to': (nxt['from'] - 1) if nxt else total})
+    shot_ranges.sort(key=lambda r: r['from'])
+    # **相邻镜头去重叠**：sent 镜头的 to 原由「下一个 sent」决定，中间夹了静音镜时
+    # 会被静音镜吃掉（2026-10-18 实测：SC02 122–342 覆盖了 SC03 287–342）。
+    # 统一从右往左收窄：每镜的 to = min(原 to, 下一镜 from - 1)。
+    for i in range(len(shot_ranges) - 2, -1, -1):
+        nxt = shot_ranges[i + 1]
+        if shot_ranges[i]['to'] >= nxt['from']:
+            shot_ranges[i]['to'] = nxt['from'] - 1
     if shot_ranges and shot_ranges[0]['id'] != 'SC02':
         print(f"⚠ 首句 shot={shot_ranges[0]['id']}；模板标题卡假设首镜头为 SC02，G1..G8 引用的 id 必须与标记一致")
     for r in shot_ranges:
@@ -670,7 +714,9 @@ async def main(narr):
         for s in sentences:
             f.write(f"  {{id: {lit(s['id'])}, chapter: {s['chapter']}, from: {s['from']}, to: {s['to']}, text: {lit(s['text'])}}},\n")
         f.write('];\n')
-        f.write('export type ShotRange = {id: string; sentence: string; from: number; to: number};\n')
+        # **sentence 可为 null**：静音镜头（括号备注行：标题要求/转场/BGM）没有对应句子，
+        # 但 spec.ts 里有画面，必须进镜头表。2026-10-18 加。
+        f.write('export type ShotRange = {id: string; sentence: string | null; from: number; to: number};\n')
         f.write('export const SHOT_RANGES: ShotRange[] = [\n')
         for r in shot_ranges:
             f.write(f"  {{id: {lit(r['id'])}, sentence: {lit(r['sentence'])}, from: {r['from']}, to: {r['to']}}},\n")
