@@ -5,7 +5,6 @@ import {
   useVideoConfig,
   interpolate,
   Easing,
-  Sequence,
 } from 'remotion';
 
 /**
@@ -146,14 +145,4 @@ const Tunnel: React.FC<TunnelProps> = ({
   );
 };
 
-/** 包装：自动处理时长和帧同步 */
-const TunnelTransition: React.FC<Partial<TunnelProps>> = (props) => {
-  const { duration = 60 } = props;
-  return (
-    <Sequence durationInFrames={duration}>
-      <Tunnel {...props} duration={duration} />
-    </Sequence>
-  );
-};
-
-export { TunnelTransition as Tunnel };
+export { Tunnel };
