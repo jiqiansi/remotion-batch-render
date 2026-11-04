@@ -2,43 +2,27 @@ name: Render Transitions
 
 on:
   workflow_dispatch:
-    inputs:
-      composition:
-        description: 'Composition ID to render'
-        required: true
-        default: 'Tunnel'
-      width:
-        description: 'Width'
-        required: false
-        default: '1920'
-      height:
-        description: 'Height'
-        required: false
-        default: '1080'
 
 jobs:
   render:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        composition: [Tunnel, Shatter, Vortex, LightLeak, Glitch, PaperFold, ParticleDissolve, WaveWarp, CubeFlip, SmokeRise]
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-
-      - name: Install dependencies
+      - name: Install
         run: npm install --no-audit --no-fund
-
-      - name: Render ${{ github.event.inputs.composition }}
+      - name: Render ${{ matrix.composition }}
         run: |
-          npx remotion render ${{ github.event.inputs.composition }} \
-            out/${{ github.event.inputs.composition }}.mp4 \
-            --codec=h264 --concurrency=2 \
-            --width=${{ github.event.inputs.width }} \
-            --height=${{ github.event.inputs.height }}
-
-      - name: Upload artifact
+          npx remotion render ${{ matrix.composition }} \
+            out/${{ matrix.composition }}.mp4 \
+            --codec=h264 --concurrency=2
+      - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ github.event.inputs.composition }}
-          path: out/${{ github.event.inputs.composition }}.mp4
+          name: ${{ matrix.composition }}
+          path: out/${{ matrix.composition }}.mp4
